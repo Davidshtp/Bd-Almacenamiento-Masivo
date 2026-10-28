@@ -1,0 +1,1 @@
+{"architecture_type":"Data Lake + Data Warehouse (Star Schema)","data_lake_layers":["raw","processed","curated"],"database_target":"MongoDB Atlas (Cloud)","iac_tool":"Terraform v1.x","project":"heavycult","status":"PROVISIONED"}

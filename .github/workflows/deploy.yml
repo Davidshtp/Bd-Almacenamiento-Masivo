@@ -1,0 +1,42 @@
+name: DataOps CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  dataops-pipeline:
+    name: Build, Test & Validate Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1. Descargar el código del repositorio
+      uses: actions/checkout@v3
+
+    - name: 2. Configurar Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: 3. Instalar dependencias del proyecto
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: 4. Validar sintaxis de los scripts de Python
+      run: |
+        python -m py_compile scripts/batch/data_warehouse.py
+        python -m py_compile scripts/batch/generar_1gb_s3.py
+
+    - name: 5. Configurar Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0
+
+    - name: 6. Inicializar y Validar Terraform
+      run: |
+        cd infrastructure
+        terraform init -backend=false
+        terraform validate
